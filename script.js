@@ -1,18 +1,39 @@
 // Data de início (data do evento)
-const startDate = new Date("April 14, 2024 00:00:00").getTime();
+const startDate = new Date("April 14, 2024 00:00:00");
 
-// Função para calcular o tempo desde a data de início
 function updateTimeElapsed() {
-    const now = new Date().getTime();
-    const timeElapsed = now - startDate;
+    const now = new Date();
 
-    // Calcular anos, meses, dias, horas, minutos e segundos
-    const years = Math.floor(timeElapsed / (1000 * 3600 * 24 * 365));
-    const months = Math.floor((timeElapsed % (1000 * 3600 * 24 * 365)) / (1000 * 3600 * 24 * 30));
-    const days = Math.floor((timeElapsed % (1000 * 3600 * 24 * 30)) / (1000 * 3600 * 24));
-    const hours = Math.floor((timeElapsed % (1000 * 3600 * 24)) / (1000 * 3600));
-    const minutes = Math.floor((timeElapsed % (1000 * 3600)) / (1000 * 60));
-    const seconds = Math.floor((timeElapsed % (1000 * 60)) / 1000);
+    // Cálculo de anos, meses e dias baseado em datas reais
+    let years = now.getFullYear() - startDate.getFullYear();
+    let months = now.getMonth() - startDate.getMonth();
+    let days = now.getDate() - startDate.getDate();
+
+    if (days < 0) {
+        months--;
+        const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+        days += prevMonth.getDate();
+    }
+
+    if (months < 0) {
+        years--;
+        months += 12;
+    }
+
+    // Calcular horas, minutos e segundos restantes
+    const pastDate = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        startDate.getHours(),
+        startDate.getMinutes(),
+        startDate.getSeconds()
+    );
+    const diffMs = now - pastDate;
+
+    const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
 
     // Atualizar o HTML com os valores calculados
     document.getElementById("years").textContent = years;
@@ -26,7 +47,11 @@ function updateTimeElapsed() {
 // Atualizar o tempo a cada 1 segundo
 setInterval(updateTimeElapsed, 1000);
 
-// Adiciona os eventos de clique nas setas para navegar
+// Selecionar os botões (certifique-se que os IDs existem no HTML)
+const prevButton = document.getElementById("prev-button");
+const nextButton = document.getElementById("next-button");
+
+// Eventos de clique nos botões
 prevButton.addEventListener('click', () => {
     moveSlide(-1); // Desliza para a esquerda (anterior)
 });
@@ -34,14 +59,14 @@ prevButton.addEventListener('click', () => {
 nextButton.addEventListener('click', () => {
     moveSlide(1); // Desliza para a direita (próxima)
 });
-        // Função para garantir que a música comece ao carregar a página
-        window.onload = function() {
-            const audio = document.getElementById('background-music');
-            audio.play().catch(function(error) {
-                console.log("Erro ao tentar tocar a música:", error);
-            });
 
-            // Abaixar o volume da música
-            audio.volume = 0.2; // Ajuste o valor conforme necessário (0.0 a 1.0)
-        };
-        
+// Função para garantir que a música comece ao carregar a página
+window.onload = function() {
+    const audio = document.getElementById('background-music');
+    if (audio) {
+        audio.play().catch(function(error) {
+            console.log("Erro ao tentar tocar a música:", error);
+        });
+        audio.volume = 0.2; // Ajuste o valor conforme necessário (0.0 a 1.0)
+    }
+};
